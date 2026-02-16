@@ -1,11 +1,904 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        PakePlus
-    </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人情帳目管理系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        .left-panel, .right-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .search-box {
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-success {
+            background: #2ecc71;
+        }
+        
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .record-details {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .record-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .record-field {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .field-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .field-value {
+            color: #34495e;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-paid {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .status-unpaid {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .edit-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .notification.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .notification.warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .page-btn {
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .page-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .page-info {
+            color: #7f8c8d;
+        }
+        
+        .empty-row {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .statistics {
+                grid-template-columns: 1fr;
+            }
+            
+            .data-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 人情帳目管理系統</h1>
+            <p class="subtitle">支援最多600條記錄，輸入姓名查看詳細信息，即時修改與保存</p>
+        </header>
+        
+        <div class="notification" id="notification"></div>
+        
+        <div class="main-content">
+            <!-- 左側面板：搜索與操作 -->
+            <div class="left-panel">
+                <h2>🔍 查詢與操作</h2>
+                
+                <div class="search-box">
+                    <div class="form-group">
+                        <label for="searchName">搜索姓名：</label>
+                        <input type="text" id="searchName" placeholder="輸入完整或部分姓名..." />
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn" onclick="searchRecord()">搜索記錄</button>
+                        <button class="btn btn-secondary" onclick="clearSearch()">清空</button>
+                    </div>
+                </div>
+                
+                <div id="searchResults" class="hidden">
+                    <h3>匹配結果：</h3>
+                    <div id="resultsList" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div class="edit-form hidden" id="editForm">
+                    <h3>✏️ 編輯記錄</h3>
+                    <div class="form-group">
+                        <label for="editSerial">序號：</label>
+                        <input type="number" id="editSerial" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label for="editPrimaryName">主姓名：</label>
+                        <input type="text" id="editPrimaryName" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label for="editAltName">備用姓名：</label>
+                        <input type="text" id="editAltName" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label for="editAmount">金額：</label>
+                        <input type="text" id="editAmount" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editStatus">欠款狀態：</label>
+                        <select id="editStatus">
+                            <option value="">-- 請選擇 --</option>
+                            <option value="欠">欠</option>
+                            <option value="不欠">不欠</option>
+                            <option value="部分欠">部分欠</option>
+                            <option value="已還清">已還清</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editNotes">備註：</label>
+                        <textarea id="editNotes" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-success" onclick="saveEdit()">保存修改</button>
+                        <button class="btn btn-secondary" onclick="cancelEdit()">取消</button>
+                    </div>
+                </div>
+                
+                <div class="statistics">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRecords">0</div>
+                        <div class="stat-label">總記錄數</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="unpaidCount">0</div>
+                        <div class="stat-label">欠款記錄</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalAmount">0</div>
+                        <div class="stat-label">總金額</div>
+                    </div>
+                </div>
+                
+                <div class="data-actions">
+                    <button class="btn" onclick="addNewRecord()">➕ 添加新記錄</button>
+                    <button class="btn btn-secondary" onclick="generateEmptyData()">📄 生成空白表</button>
+                </div>
+            </div>
+            
+            <!-- 右側面板：數據展示 -->
+            <div class="right-panel">
+                <h2>📋 所有記錄列表</h2>
+                
+                <div class="table-container">
+                    <table id="recordsTable">
+                        <thead>
+                            <tr>
+                                <th>序號</th>
+                                <th>主姓名</th>
+                                <th>備用姓名</th>
+                                <th>金額</th>
+                                <th>狀態</th>
+                                <th>備註</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- 動態生成表格內容 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button class="page-btn" onclick="previousPage()" id="prevBtn">上一頁</button>
+                    <span class="page-info" id="pageInfo">第 1 頁，共 1 頁</span>
+                    <button class="page-btn" onclick="nextPage()" id="nextBtn">下一頁</button>
+                </div>
+                
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="exportData()">💾 導出數據</button>
+                    <button class="btn btn-secondary" onclick="importData()">📂 導入數據</button>
+                    <button class="btn" onclick="location.reload()">🔄 刷新頁面</button>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
+            <p>支援最多600條記錄，數據僅保存在瀏覽器中，請及時導出備份</p>
+        </div>
+    </div>
+
+    <!-- 文件導入隱藏輸入框 -->
+    <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileSelect(event)" />
+
+    <script>
+        // 初始化數據 - 支援最多600條記錄
+        let ledgerData = [];
+        
+        // 分頁配置
+        const ITEMS_PER_PAGE = 50;
+        let currentPage = 1;
+        
+        // 當前正在編輯的記錄索引
+        let currentEditIndex = -1;
+        
+        // 加載數據
+        document.addEventListener('DOMContentLoaded', function() {
+            // 嘗試從localStorage加載數據
+            const savedData = localStorage.getItem('ledgerData');
+            if (savedData) {
+                try {
+                    ledgerData = JSON.parse(savedData);
+                } catch (e) {
+                    console.error('解析本地數據失敗:', e);
+                    showNotification('本地數據損壞，已初始化新數據', 'error');
+                    // 生成示例數據
+                    generateSampleData();
+                }
+            } else {
+                // 生成示例數據
+                generateSampleData();
+            }
+            
+            // 確保數據長度為600
+            ensureDataLength(600);
+            
+            updateTable();
+            updateStatistics();
+            updatePagination();
+        });
+
+        // 生成示例數據
+        function generateSampleData() {
+            ledgerData = [
+                { serial: 1, primary: "張三", alt: "張三", amount: "1000", status: "欠", notes: "結婚禮金" },
+                { serial: 2, primary: "李四", alt: "李四", amount: "2000", status: "不欠", notes: "生日禮金" },
+                { serial: 3, primary: "王五", alt: "王五", amount: "1500", status: "欠", notes: "升學宴" },
+                { serial: 4, primary: "趙六", alt: "趙六", amount: "3000", status: "不欠", notes: "喬遷之喜" },
+                { serial: 5, primary: "錢七", alt: "錢七", amount: "2500", status: "欠", notes: "滿月酒" }
+            ];
+        }
+
+        // 確保數據長度
+        function ensureDataLength(maxLength) {
+            for (let i = ledgerData.length + 1; i <= maxLength; i++) {
+                ledgerData.push({
+                    serial: i,
+                    primary: "",
+                    alt: "",
+                    amount: "",
+                    status: "",
+                    notes: ""
+                });
+            }
+        }
+
+        // 生成空白數據表
+        function generateEmptyData() {
+            if (confirm('確定要清空所有數據並生成空白表嗎？此操作不可恢復！')) {
+                ledgerData = [];
+                for (let i = 1; i <= 600; i++) {
+                    ledgerData.push({
+                        serial: i,
+                        primary: "",
+                        alt: "",
+                        amount: "",
+                        status: "",
+                        notes: ""
+                    });
+                }
+                localStorage.setItem('ledgerData', JSON.stringify(ledgerData));
+                updateTable();
+                updateStatistics();
+                updatePagination();
+                showNotification('已生成空白數據表（600條記錄）', 'success');
+            }
+        }
+
+        // 更新表格顯示
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, ledgerData.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const record = ledgerData[i];
+                const row = document.createElement('tr');
+                
+                // 檢查記錄是否存在有效數據
+                const hasData = record.primary || record.amount || record.status || record.notes;
+                
+                row.innerHTML = `
+                    <td>${record.serial}</td>
+                    <td>${record.primary || '<span class="empty-row">未填寫</span>'}</td>
+                    <td>${record.alt || ''}</td>
+                    <td>${record.amount || ''}</td>
+                    <td>
+                        <span class="${record.status === '欠' ? 'status-unpaid' : record.status ? 'status-paid' : ''}">
+                            ${record.status || ''}
+                        </span>
+                    </td>
+                    <td>${record.notes || ''}</td>
+                    <td>
+                        <button class="btn" onclick="viewRecord(${i})" style="padding: 5px 10px; font-size: 14px;">查看</button>
+                        <button class="btn btn-secondary" onclick="editRecord(${i})" style="padding: 5px 10px; font-size: 14px;">編輯</button>
+                        ${hasData ? `<button class="btn btn-danger" onclick="deleteRecord(${i})" style="padding: 5px 10px; font-size: 14px;">刪除</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // 更新統計信息
+        function updateStatistics() {
+            const totalRecords = ledgerData.length;
+            const unpaidCount = ledgerData.filter(r => r.status === '欠').length;
+            
+            // 計算總金額
+            let totalAmount = 0;
+            ledgerData.forEach(record => {
+                if (record.amount && !isNaN(parseFloat(record.amount))) {
+                    totalAmount += parseFloat(record.amount);
+                }
+            });
+            
+            document.getElementById('totalRecords').textContent = totalRecords;
+            document.getElementById('unpaidCount').textContent = unpaidCount;
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+        }
+
+        // 更新分頁信息
+        function updatePagination() {
+            const totalPages = Math.ceil(ledgerData.length / ITEMS_PER_PAGE);
+            document.getElementById('pageInfo').textContent = `第 ${currentPage} 頁，共 ${totalPages} 頁`;
+            
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        }
+
+        // 上一頁
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updateTable();
+                updatePagination();
+            }
+        }
+
+        // 下一頁
+        function nextPage() {
+            const totalPages = Math.ceil(ledgerData.length / ITEMS_PER_PAGE);
+            if (currentPage < totalPages) {
+                currentPage++;
+                updateTable();
+                updatePagination();
+            }
+        }
+
+        // 搜索記錄
+        function searchRecord() {
+            const searchTerm = document.getElementById('searchName').value.trim().toLowerCase();
+            if (!searchTerm) {
+                showNotification('請輸入搜索內容', 'warning');
+                return;
+            }
+            
+            const results = ledgerData.filter(record => 
+                (record.primary && record.primary.toLowerCase().includes(searchTerm)) || 
+                (record.alt && record.alt.toLowerCase().includes(searchTerm))
+            );
+            
+            const resultsList = document.getElementById('resultsList');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                resultsList.innerHTML = '<p style="color: #e74c3c;">未找到匹配的記錄</p>';
+                searchResults.classList.remove('hidden');
+                return;
+            }
+            
+            let html = '';
+            results.forEach((record, index) => {
+                html += `
+                    <div class="record-item">
+                        <div class="record-field">
+                            <span class="field-label">序號：</span>
+                            <span class="field-value">${record.serial}</span>
+                        </div>
+                        <div class="record-field">
+                            <span class="field-label">姓名：</span>
+                            <span class="field-value">${record.primary || ''} ${record.alt ? `(${record.alt})` : ''}</span>
+                        </div>
+                        <div class="record-field">
+                            <span class="field-label">金額：</span>
+                            <span class="field-value">${record.amount || ''}</span>
+                        </div>
+                        <div class="record-field">
+                            <span class="field-label">狀態：</span>
+                            <span class="field-value ${record.status === '欠' ? 'status-unpaid' : 'status-paid'}">${record.status || ''}</span>
+                        </div>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <button class="btn" onclick="viewRecord(${ledgerData.indexOf(record)})" style="padding: 5px 10px; font-size: 14px; margin-right: 5px;">查看</button>
+                            <button class="btn btn-secondary" onclick="editRecord(${ledgerData.indexOf(record)})" style="padding: 5px 10px; font-size: 14px;">編輯</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsList.innerHTML = html;
+            searchResults.classList.remove('hidden');
+        }
+
+        // 查看記錄詳細信息
+        function viewRecord(index) {
+            const record = ledgerData[index];
+            const message = `
+序號：${record.serial}
+主姓名：${record.primary || '未填寫'}
+備用姓名：${record.alt || '未填寫'}
+金額：${record.amount || '未填寫'}
+狀態：${record.status || '未填寫'}
+備註：${record.notes || '未填寫'}
+            `;
+            showNotification(message, 'success');
+        }
+
+        // 編輯記錄
+        function editRecord(index) {
+            const record = ledgerData[index];
+            currentEditIndex = index;
+            
+            document.getElementById('editSerial').value = record.serial;
+            document.getElementById('editPrimaryName').value = record.primary || '';
+            document.getElementById('editAltName').value = record.alt || '';
+            document.getElementById('editAmount').value = record.amount || '';
+            document.getElementById('editStatus').value = record.status || '';
+            document.getElementById('editNotes').value = record.notes || '';
+            
+            document.getElementById('editForm').classList.remove('hidden');
+            
+            // 滾動到編輯表單
+            document.getElementById('editForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 保存編輯
+        function saveEdit() {
+            if (currentEditIndex === -1) return;
+            
+            const record = ledgerData[currentEditIndex];
+            record.primary = document.getElementById('editPrimaryName').value;
+            record.alt = document.getElementById('editAltName').value;
+            record.amount = document.getElementById('editAmount').value;
+            record.status = document.getElementById('editStatus').value;
+            record.notes = document.getElementById('editNotes').value;
+            
+            // 保存到localStorage
+            localStorage.setItem('ledgerData', JSON.stringify(ledgerData));
+            
+            updateTable();
+            updateStatistics();
+            cancelEdit();
+            
+            showNotification('記錄已成功更新！', 'success');
+        }
+
+        // 刪除記錄
+        function deleteRecord(index) {
+            if (confirm('確定要刪除這條記錄嗎？此操作不可恢復！')) {
+                ledgerData[index] = {
+                    serial: index + 1,
+                    primary: "",
+                    alt: "",
+                    amount: "",
+                    status: "",
+                    notes: ""
+                };
+                
+                localStorage.setItem('ledgerData', JSON.stringify(ledgerData));
+                updateTable();
+                updateStatistics();
+                
+                showNotification('記錄已刪除！', 'success');
+            }
+        }
+
+        // 取消編輯
+        function cancelEdit() {
+            currentEditIndex = -1;
+            document.getElementById('editForm').classList.add('hidden');
+        }
+
+        // 清空搜索
+        function clearSearch() {
+            document.getElementById('searchName').value = '';
+            document.getElementById('searchResults').classList.add('hidden');
+        }
+
+        // 添加新記錄
+        function addNewRecord() {
+            // 找到第一個空記錄
+            let emptyIndex = -1;
+            for (let i = 0; i < ledgerData.length; i++) {
+                if (!ledgerData[i].primary && !ledgerData[i].amount && !ledgerData[i].notes) {
+                    emptyIndex = i;
+                    break;
+                }
+            }
+            
+            if (emptyIndex === -1) {
+                // 如果沒有空記錄，添加到末尾
+                const newSerial = ledgerData.length + 1;
+                const newRecord = {
+                    serial: newSerial,
+                    primary: "新記錄",
+                    alt: "",
+                    amount: "",
+                    status: "",
+                    notes: ""
+                };
+                ledgerData.push(newRecord);
+                emptyIndex = ledgerData.length - 1;
+                
+                // 確保數據長度
+                ensureDataLength(600);
+            }
+            
+            localStorage.setItem('ledgerData', JSON.stringify(ledgerData));
+            updateTable();
+            updateStatistics();
+            updatePagination();
+            
+            // 自動進入編輯模式
+            setTimeout(() => {
+                editRecord(emptyIndex);
+                // 清空"新記錄"文字以便用戶填寫
+                document.getElementById('editPrimaryName').value = "";
+            }, 100);
+            
+            showNotification('已添加新記錄，請編輯填寫信息', 'warning');
+        }
+
+        // 導出數據
+        function exportData() {
+            // 過濾空記錄
+            const filteredData = ledgerData.filter(record => 
+                record.primary || record.amount || record.status || record.notes
+            );
+            
+            const dataStr = JSON.stringify(filteredData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const downloadUrl = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `人情帳目數據_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(downloadUrl);
+            
+            showNotification(`數據已導出為JSON文件！共${filteredData.length}條記錄`, 'success');
+        }
+
+        // 導入數據
+        function importData() {
+            document.getElementById('fileInput').click();
+        }
+
+        // 處理文件選擇
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (Array.isArray(importedData)) {
+                        // 合併數據
+                        importedData.forEach(newRecord => {
+                            const index = newRecord.serial - 1;
+                            if (index >= 0 && index < ledgerData.length) {
+                                // 更新現有記錄
+                                Object.assign(ledgerData[index], newRecord);
+                            } else {
+                                // 添加新記錄
+                                ledgerData.push(newRecord);
+                            }
+                        });
+                        
+                        // 確保數據長度
+                        ensureDataLength(600);
+                        
+                        localStorage.setItem('ledgerData', JSON.stringify(ledgerData));
+                        updateTable();
+                        updateStatistics();
+                        updatePagination();
+                        showNotification(`數據導入成功！共${importedData.length}條記錄`, 'success');
+                    } else {
+                        showNotification('文件格式不正確，必須是JSON數組', 'error');
+                    }
+                } catch (error) {
+                    showNotification('讀取文件失敗：' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+            
+            // 清空文件輸入框
+            event.target.value = '';
+        }
+
+        // 顯示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.style.display = 'block';
+            
+            // 5秒後自動隱藏
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
 </html>
